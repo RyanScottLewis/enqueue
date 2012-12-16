@@ -128,11 +128,7 @@ By default, Enqueue uses the [Queue][queue] class from the Ruby standard library
 
 > Note: This example implements the [`service`][service] gem to push and pop messages to a queue within a run-loop that is running in it's own Thread.
 
-`my_pub_sub`
-
 ```ruby
-#!/usr/bin/env ruby
-
 require 'enqueue'
 require 'service'
 
@@ -175,22 +171,9 @@ subscriber_threads = (0...5).collect { Subscriber.new }.collect(&:run!)
 
 ##### Using Multiple Queues
 
-`my_pub_sub`
-
 ```ruby
-#!/usr/bin/env ruby
-
 require 'enqueue'
 require 'service'
-
-publisher_threads = []
-
-trap('INT') do
-  print 'Killing all publishers... '
-  publisher_threads.each(&:kill)
-  puts 'Done!'
-end
-puts "Press CTRL-C to exit."
 
 class HelloPublisher < Enqueue::Publisher
   include Service::Base
@@ -240,13 +223,11 @@ HelloWorldSubscriber.new
 # => ...
 ```
 
-#### RabbitMQ
+#### Adapters
 
-`my_pub_sub`
+##### RabbitMQ
 
 ```ruby
-#!/usr/bin/env ruby
-
 class Publisher < Enqueue::Publisher
   adapter :rabbit_mq
   # This class now has RabbitMQ specific class and
