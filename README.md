@@ -47,7 +47,7 @@ Remove any previous adapter specific methods and include the module associated w
 *returns: Enqueue::Message*
 
 **message** \<Object> The message to push. Note that some adapters require this to be a String.  
-**options** <Hash, #to_hash, #to_h> The adapter-specific options.
+**options** \<Hash, #to_hash, #to_h> The adapter-specific options.
 
 Push a message to the/a queue.
 
