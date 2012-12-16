@@ -162,8 +162,8 @@ class Subscriber < Enqueue::Subscriber
   include Service::Base
   
   def execute
-    sleep rand(10)
-    puts pop
+    message = pop
+    puts message unless message.nil?
   end
 end
 
@@ -171,6 +171,73 @@ publisher_threads = (0...5).collect { Publisher.new }.collect(&:run!)
 subscriber_threads = (0...5).collect { Subscriber.new }.collect(&:run!)
 
 [publisher_threads, subscriber_threads].flatten.each(&:join)
+```
+
+##### Using Multiple Queues
+
+`my_pub_sub`
+
+```ruby
+#!/usr/bin/env ruby
+
+require 'enqueue'
+require 'service'
+
+publisher_threads = []
+
+trap('INT') do
+  print 'Killing all publishers... '
+  publisher_threads.each(&:kill)
+  puts 'Done!'
+end
+puts "Press CTRL-C to exit."
+
+class HelloPublisher < Enqueue::Publisher
+  include Service::Base
+  
+  def execute
+    sleep rand(10)
+    push 'Hello, ', to: :hello_queue
+  end
+end
+
+class WorldPublisher < Enqueue::Publisher
+  include Service::Base
+  
+  def execute
+    sleep rand(10)
+    push 'World!', to: :world_queue
+  end
+end
+
+class HelloWorldSubscriber < Enqueue::Subscriber
+  include Service::Base
+  
+  # Publishers and Subscribers do not define #initialize so you do not need to remember to call `super` =)
+  def initialize
+    @publisher_threads, @buffer = [], []
+    @publisher_threads += (0...3).collect { HelloPublisher.new }.collect(&:run!)
+    @publisher_threads += (0...3).collect { WorldPublisher.new }.collect(&:run!)
+    
+    run
+  end
+  
+  def execute
+    queue = @buffer.empty? ? :hello_queue : :world_queue
+    message = pop, from: queue
+    @buffer << message unless message.nil?
+    
+    if @buffer.length == 2
+      puts @buffer.join
+      @buffer.clear
+    end
+  end
+end
+
+HelloWorldSubscriber.new
+# => Hello, World!
+# => Hello, World!
+# => ...
 ```
 
 #### RabbitMQ
