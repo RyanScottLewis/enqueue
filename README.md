@@ -50,8 +50,8 @@ enqueue(message, options={})
 
 Push a message to a queue.
 
-aliases: push, shift, <<
-returns: Enqueue::Message
+aliases: push, unshift, <<
+returns: Object - The 'message' that was enqueued.
 ```
 
 ###### Arguments
@@ -62,7 +62,10 @@ returns: Enqueue::Message
 ###### Options
 
 `:to` \<Symbol, #to_sym, String, #to_s> The name of the queue to push the message to. 
-Enqueue will attempt to create a new queue, if one cannot be found. Default is `:default`.
+Enqueue will attempt to create a new queue, if one cannot be found (lazily-created). 
+Note that the queue name is global, meaning that the same Symbol will correspond to the same queue 
+no matter which instance is pushing to it. 
+Default is `:global`.
 
 ### Subscriber
 
@@ -97,17 +100,25 @@ returns: true, false
 ##### Instance Methods
 
 ```ruby
-pop(options={})
+dequeue(options={})
 
 Pop a message off a queue.
 
-aliases: dequeue, unshift
-returns: Enqueue::Message
+aliases: pop, shift
+returns: Object, nil
 ```
 
 ###### Arguments
 
 **options** \<Hash, #to_hash, #to_h> The adapter-specific options.
+
+###### Options
+
+`:from` \<Symbol, #to_sym, String, #to_s> The name of the queue to pop the message from. 
+Enqueue will attempt to create a new queue, if one cannot be found (lazily-created). 
+Note that the queue name is global, meaning that the same Symbol will correspond to the same queue 
+no matter which instance is pushing to it. 
+Default is `:global`.
 
 ### Example
 
