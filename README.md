@@ -70,7 +70,7 @@ will have the following methods:
 `adapter(name)`  
 *returns: true, false*
 
-**name** <Symbol, #to_sym> The name of the adapter to mixin.
+**name** \<Symbol, #to_sym> The name of the adapter to mixin.
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
@@ -80,7 +80,7 @@ Remove any previous adapter specific methods and include the module associated w
 *aliases: dequeue, unshift*  
 *returns: Enqueue::Message*
 
-**options** <Hash, #to_hash, #to_h> The adapter-specific options.
+**options** \<Hash, #to_hash, #to_h> The adapter-specific options.
 
 Push a message to the/a queue.
 
