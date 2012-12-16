@@ -29,29 +29,35 @@ You can define a publisher by subclassing `Enqueue::Publisher` or by including/e
 Besides the methods that are mixed into publisher by an adapter, all publishers 
 will have the following methods:
 
-##### Class
+##### Class Methods
 
-`adapter(name)`  
-*returns: true, false*
-
-**name** \<Symbol, #to_sym> The name of the adapter to mixin.
+```ruby
+adapter(name)
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
-> Note: Adapters *will* overwrite any instance/class method that it uses.  
-> Not all adapters have the same set of methods so you may have to investigate which methods 
-> not to use when integrating the ability to publish to a queue onto an existing object.
+returns: true, false
+```
 
-##### Instance
+###### Arguments
 
-`enqueue(message, options={})`  
-*aliases: push, shift, <<*  
-*returns: Enqueue::Message*
+*name* \<Symbol, #to_sym> The name of the adapter to mixin.
 
-**message** \<Object> The message to push. Note that some adapters require this to be a String.  
-**options** \<Hash, #to_hash, #to_h> The adapter-specific options.
+##### Instance Methods
 
-Push a message to the/a queue.
+```ruby
+enqueue(message, options={})
+
+Push a message to a queue.
+
+aliases: push, shift, <<
+returns: Enqueue::Message
+```
+
+###### Arguments
+
+*message* \<Object> The message to push. Note that some adapters require this to be a String.  
+*options* \<Hash, #to_hash, #to_h> The adapter-specific options.
 
 ### Subscriber
 
@@ -69,35 +75,50 @@ including/extending `Enqueue::Subscriber::Base`.
 Besides the methods that are mixed into publisher by an adapter, all publishers 
 will have the following methods:
 
-##### Class
+##### Class Methods
 
-`adapter(name)`  
-*returns: true, false*
-
-**name** \<Symbol, #to_sym> The name of the adapter to mixin.
+```ruby
+adapter(name)
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
-##### Instance
+returns: true, false
+```
 
-`pop(options={})`  
-*aliases: dequeue, unshift*  
-*returns: Enqueue::Message*
+###### Arguments
+
+*name* \<Symbol, #to_sym> The name of the adapter to mixin.
+
+##### Instance Methods
+
+```ruby
+pop(options={})
+
+Pop a message off a queue.
+
+aliases: dequeue, unshift
+returns: Enqueue::Message
+```
+
+###### Arguments
 
 **options** \<Hash, #to_hash, #to_h> The adapter-specific options.
 
-Push a message to the/a queue.
-
-`run`  
+```ruby
+run()
 
 In a loop, wait until the queue has a message. When it does, pop it off.
+```
 
 > Note: All adapters overwrite this method.
 
-`run!`  
-*returns: Thread*
+```ruby
+run!()
 
 Call `run` in a new thread.
+
+returns: Thread
+```
 
 ### Example
 
