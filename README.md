@@ -65,7 +65,7 @@ including/extending `Enqueue::Subscriber::Base`.
 Besides the methods that are mixed into publisher by an adapter, all publishers 
 will have the following methods:
 
-#### Class
+##### Class
 
 `adapter(name)`  
 *returns: true, false*
@@ -74,7 +74,7 @@ will have the following methods:
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
-#### Instance
+##### Instance
 
 `pop(options={})`  
 *aliases: dequeue, unshift*  
