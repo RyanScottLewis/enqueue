@@ -59,6 +59,11 @@ returns: Enqueue::Message
 *message* \<Object> The message to push. Note that some adapters require this to be a String.  
 *options* \<Hash, #to_hash, #to_h> The adapter-specific options.
 
+###### Options
+
+`:to` \<Symbol, #to_sym, String, #to_s> The name of the queue to push the message to. 
+Enqueue will attempt to create a new queue, if one cannot be found. Default is `:default`.
+
 ### Subscriber
 
 ***
@@ -104,62 +109,57 @@ returns: Enqueue::Message
 
 **options** \<Hash, #to_hash, #to_h> The adapter-specific options.
 
-```ruby
-run()
-
-In a loop, wait until the queue has a message. When it does, pop it off.
-```
-
-> Note: All adapters overwrite this method.
-
-```ruby
-run!()
-
-Call `run` in a new thread.
-
-returns: Thread
-```
-
 ### Example
 
 #### Ruby Queue
 
 By default, Enqueue uses the [Queue][queue] class from the Ruby standard library.
 
+> Note: This example implements the [`service`][service] gem to push and pop messages to a queue within a run-loop that is running in it's own Thread.
+
 `my_pub_sub`
 
 ```ruby
 #!/usr/bin/env ruby
 
-subscribers, publishers, threads = [], [], []
+require 'enqueue'
+require 'service'
+
+publisher_threads, subscriber_threads = [], []
 
 trap('INT') do
   print 'Killing all publishers... '
-  publishers.each(&:disconnect)
+  publisher_threads.each(&:kill)
   puts 'Done!'
   
   print 'Killing all subscribers... '
-  subscribers.each(&:disconnect)
+  subscriber_threads.each(&:kill)
   puts 'Done!'
 end
 puts "Press CTRL-C to exit."
 
-5.times do
-  publisher = Enqueue::Publisher.new
-  publishers << publisher
-  threads << Thread.new do
-    loop do
-      sleep rand(10)
-      publisher.push 'Hello, World!'
-    end
+class Publisher < Enqueue::Publisher
+  include Service::Base
+  
+  def execute
+    sleep rand(10)
+    push 'Hello, World!'
   end
 end
 
-5.times do
-  subscriber = Enqueue::Subscriber.new
-  subscribers << subscriber
-  threads << subscriber.run!
+class Subscriber < Enqueue::Subscriber
+  include Service::Base
+  
+  def execute
+    sleep rand(10)
+    puts pop
+  end
 end
+
+publisher_threads = (0...5).collect { Publisher.new }.collect(&:run!)
+subscriber_threads = (0...5).collect { Subscriber.new }.collect(&:run!)
+
+[publisher_threads, subscriber_threads].flatten.each(&:join)
 ```
 
 #### RabbitMQ
@@ -236,3 +236,4 @@ The MIT License (MIT) - See LICENSE for further details.
 
 [message_queue]: http://en.wikipedia.org/wiki/Message_queue
 [queue]: http://rubydoc.info/stdlib/thread/Queue
+[service]: https://github.com/RyanScottLewis/service
