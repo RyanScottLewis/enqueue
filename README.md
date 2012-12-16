@@ -15,6 +15,8 @@ multi-threading.
 
 ### Publisher
 
+***
+
 A publisher is any object that can find and push messages to a queue.
 
 #### Defining
@@ -27,12 +29,12 @@ You can define a publisher by subclassing `Enqueue::Publisher` or by including/e
 Besides the methods that are mixed into publisher by an adapter, all publishers 
 will have the following methods:
 
-#### Class
+##### Class
 
 `adapter(name)`  
 *returns: true, false*
 
-**name** <Symbol, #to_sym> The name of the adapter to mixin.
+**name** \<Symbol, #to_sym> The name of the adapter to mixin.
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
@@ -40,7 +42,7 @@ Remove any previous adapter specific methods and include the module associated w
 > Not all adapters have the same set of methods so you may have to investigate which methods 
 > not to use when integrating the ability to publish to a queue onto an existing object.
 
-#### Instance
+##### Instance
 
 `enqueue(message, options={})`  
 *aliases: push, shift, <<*  
@@ -52,6 +54,8 @@ Remove any previous adapter specific methods and include the module associated w
 Push a message to the/a queue.
 
 ### Subscriber
+
+***
 
 A subscriber is any object that can find and pop messages off a queue.
 
