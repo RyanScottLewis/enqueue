@@ -50,7 +50,7 @@ enqueue(message, options={})
 
 Push a message to a queue.
 
-aliases: push, unshift, <<
+aliases: push, send, unshift, <<
 returns: Object - The 'message' that was enqueued.
 ```
 
@@ -104,7 +104,7 @@ dequeue(options={})
 
 Pop a message off a queue.
 
-aliases: pop, shift
+aliases: pop, receive, shift
 returns: Object, nil
 ```
 
@@ -126,11 +126,13 @@ Default is `:global`.
 
 By default, Enqueue uses the [Queue][queue] class from the Ruby standard library.
 
-> Note: This example implements the [`service`][service] gem to push and pop messages to a queue within a run-loop that is running in it's own Thread.
+> Enqueue utilizes the [`service`][service] gem to push and pop messages to a queue within a run-loop that is running in it's own Thread.
+> 
+> Service gives simply allows you to run your code that is within the execute method in four different ways: 
+> once (execute), once in a new Thread (execute!), in a loop (start/run), or in a loop within a new Thread (start!/run!)
 
 ```ruby
 require 'enqueue'
-require 'service'
 
 publisher_threads, subscriber_threads = [], []
 
@@ -146,19 +148,15 @@ end
 puts "Press CTRL-C to exit."
 
 class Publisher < Enqueue::Publisher
-  include Service::Base
-  
   def execute
     sleep rand(10)
-    push 'Hello, World!'
+    enqueue 'Hello, World!'
   end
 end
 
 class Subscriber < Enqueue::Subscriber
-  include Service::Base
-  
   def execute
-    message = pop
+    message = dequeue
     puts message unless message.nil?
   end
 end
@@ -169,15 +167,12 @@ subscriber_threads = (0...5).collect { Subscriber.new }.collect(&:run!)
 [publisher_threads, subscriber_threads].flatten.each(&:join)
 ```
 
-##### Using Multiple Queues
+#### Multiple Queues
 
 ```ruby
 require 'enqueue'
-require 'service'
 
 class HelloWorldPublisher < Enqueue::Publisher
-  include Service::Base
-  
   def execute
     sleep rand(10)
     push
@@ -186,19 +181,17 @@ end
 
 class HelloPublisher < HelloWorldPublisher
   def push
-    super 'Hello, ', to: :hello_queue
+    enqueue 'Hello, ', to: :hello_queue
   end
 end
 
 class WorldPublisher < HelloWorldPublisher
   def push
-    super 'World!', to: :world_queue
+    enqueue 'World!', to: :world_queue
   end
 end
 
 class HelloWorldSubscriber < Enqueue::Subscriber
-  include Service::Base
-  
   # Publishers and Subscribers do not define #initialize so you do not need to remember to call `super` =)
   def initialize
     setup_instance_variables
@@ -209,8 +202,7 @@ class HelloWorldSubscriber < Enqueue::Subscriber
   end
   
   def execute
-    queue = @buffer.empty? ? :hello_queue : :world_queue
-    message = pop, from: queue
+    message = dequeue from: @buffer.empty? ? :hello_queue : :world_queue
     @buffer << message unless message.nil?
     
     if @buffer.length == 2
@@ -250,6 +242,91 @@ HelloWorldSubscriber.new
 # => ...
 ```
 
+#### Subscriber Helpers
+
+##### `subscribe` Class Method
+
+You can "subscribe" a method to a queue by using the `subscribe` class method.
+
+For example, the following:
+
+```ruby
+class Subscriber < Enqueue::Subscriber
+  def execute
+    message = dequeue
+    puts message unless message.nil?
+  end
+end
+```
+
+Can be written as:
+
+```ruby
+class Subscriber < Enqueue::Subscriber
+  subscribe :print_message
+  
+  def print_message(message)
+    puts message
+  end
+end
+````
+
+Which is the same as:
+
+```ruby
+class Subscriber < Enqueue::Subscriber
+  subscribe :print_message
+  
+  def print_message(message)
+    puts message
+  end
+  
+  def execute
+    run_subscriptions
+  end
+end
+````
+
+##### `run_subscriptions` Instance Method
+
+The `run_subscriptions` instance method will call `run_subscription` with all of the subscriptions defined 
+on the instance's class in the order they were defined.
+
+##### `run_subscription` Instance Method
+
+The `run_subscription` instance method will call `dequeue` with the options given to the `subscribe` method 
+and call the instance method subscribed to the queue, if the message is not nil.
+
+If the `:condition` option was passed to the `subscribe` method, then the instance method subscribed will be 
+called if the proc given to the `:condition` option returns true.
+
+For example, the following:
+
+```ruby
+class Subscriber < Enqueue::Subscriber
+  def execute
+    message = dequeue
+    puts message unless message.nil?
+  end
+end
+```
+
+Can be written as:
+
+```ruby
+class Subscriber < Enqueue::Subscriber
+  subscribe :print_message
+  
+  def print_message(message)
+    puts message
+  end
+  
+  def execute
+    run_subscription :print_message
+  end
+end
+````
+
 #### Adapters
 
 ##### RabbitMQ
@@ -263,18 +340,17 @@ class Publisher < Enqueue::Publisher
   port 5672
   
   def notify(message)
-    enqueue message, to: 'my_message_queue'
+    enqueue message, to: 'my_scope.my_message_queue'
   end
 end
 
 class Subscriber < Enqueue::Subscriber
   adapter :rabbit_mq
-  # This class now has RabbitMQ specific class and
-  # instance methods:
+  # This class now has RabbitMQ specific class and instance methods:
   host 'localhost'
   port 5672
   
-  subscribe :print_message, to: 'my_message_queue'
+  subscribe :print_message, to: 'my_scope.my_message_queue'
   
   def print_message(message)
     puts message
