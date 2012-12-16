@@ -175,21 +175,24 @@ subscriber_threads = (0...5).collect { Subscriber.new }.collect(&:run!)
 require 'enqueue'
 require 'service'
 
-class HelloPublisher < Enqueue::Publisher
+class HelloWorldPublisher < Enqueue::Publisher
   include Service::Base
   
   def execute
     sleep rand(10)
-    push 'Hello, ', to: :hello_queue
+    push
   end
 end
 
-class WorldPublisher < Enqueue::Publisher
-  include Service::Base
-  
-  def execute
-    sleep rand(10)
-    push 'World!', to: :world_queue
+class HelloPublisher < HelloWorldPublisher
+  def push
+    super 'Hello, ', to: :hello_queue
+  end
+end
+
+class WorldPublisher < HelloWorldPublisher
+  def push
+    super 'World!', to: :world_queue
   end
 end
 
@@ -198,9 +201,9 @@ class HelloWorldSubscriber < Enqueue::Subscriber
   
   # Publishers and Subscribers do not define #initialize so you do not need to remember to call `super` =)
   def initialize
-    @publisher_threads, @buffer = [], []
-    @publisher_threads += (0...3).collect { HelloPublisher.new }.collect(&:run!)
-    @publisher_threads += (0...3).collect { WorldPublisher.new }.collect(&:run!)
+    setup_instance_variables
+    setup_signals
+    setup_publishers
     
     run
   end
@@ -214,6 +217,30 @@ class HelloWorldSubscriber < Enqueue::Subscriber
       puts @buffer.join
       @buffer.clear
     end
+  end
+  
+  protected
+  
+  def setup_instance_variables
+    @publisher_threads, @buffer = [], []
+  end
+  
+  def setup_signals
+    trap('INT') do
+      print 'Killing all publishers... '
+      @publisher_threads.each(&:kill)
+      puts 'Done!'
+      
+      print 'Stopping subscriber... '
+      stop
+      puts 'Done!'
+    end
+    puts "Press CTRL-C to exit."
+  end
+  
+  def setup_publishers
+    @publisher_threads += (0...3).collect { HelloPublisher.new }.collect(&:run!)
+    @publisher_threads += (0...3).collect { WorldPublisher.new }.collect(&:run!)
   end
 end
 
