@@ -322,11 +322,14 @@ end
 
 #### Adapters
 
-##### RabbitMQ
+##### AMQP
+
+Any message queue broker that utilizes the AMQP protocol (RabbitMQ, SqiftMQ, etc.) can be used by
+using the `:amqp` adapter:
 
 ```ruby
 class Publisher < Enqueue::Publisher
-  adapter :rabbit_mq
+  adapter :amqp
   # This class now has RabbitMQ specific class and instance methods:
   host 'localhost'
   port 5672
@@ -337,7 +340,7 @@ class Publisher < Enqueue::Publisher
 end
 
 class Subscriber < Enqueue::Subscriber
-  adapter :rabbit_mq
+  adapter :amqp
   # This class now has RabbitMQ specific class and instance methods:
   host 'localhost'
   port 5672
