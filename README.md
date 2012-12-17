@@ -51,17 +51,16 @@ Push a message to a queue.
 aliases: push, send, unshift, <<
 returns: Object - The 'message' that was enqueued.
 arguments:
-  message (Object) The message to push. Note that some adapters require this to be a String.
-  options (Hash, to_hash, to_h) The adapter-specific options.
+  message (Object)
+    The message to push. Note that some adapters require this to be a String.
+  options (Hash, to_hash, to_h)
+    The adapter-specific options.
+options:
+  :to (Symbol, to_sym, String, to_s)
+    The name of the queue to push the message to. Enqueue will attempt to create a new queue, if one 
+    cannot be found (lazily-created). Note that the queue name is global, meaning that the same Symbol 
+    will correspond to the same queue no matter which instance is pushing to it. Default is `:global`.
 ```
-
-###### Options
-
-`:to` \<Symbol, #to_sym, String, #to_s> The name of the queue to push the message to. 
-Enqueue will attempt to create a new queue, if one cannot be found (lazily-created). 
-Note that the queue name is global, meaning that the same Symbol will correspond to the same queue 
-no matter which instance is pushing to it. 
-Default is `:global`.
 
 ### Subscriber
 
