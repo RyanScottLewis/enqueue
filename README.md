@@ -50,12 +50,10 @@ Push a message to a queue.
 
 aliases: push, send, unshift, <<
 returns: Object - The 'message' that was enqueued.
+arguments:
+  message (Object) The message to push. Note that some adapters require this to be a String.
+  options (Hash, to_hash, to_h) The adapter-specific options.
 ```
-
-###### Arguments
-
-*message* \<Object> The message to push. Note that some adapters require this to be a String.  
-*options* \<Hash, #to_hash, #to_h> The adapter-specific options.
 
 ###### Options
 
