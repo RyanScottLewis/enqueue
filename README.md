@@ -38,7 +38,8 @@ Remove any previous adapter specific methods and include the module associated w
 
 returns: true, false
 arguments:
-  name (Symbol, to_sym) The name of the adapter to mixin.
+  name (Symbol, to_sym)
+    The name of the adapter to mixin.
 ```
 
 ##### Instance Methods
@@ -86,11 +87,10 @@ adapter(name)
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
 returns: true, false
+arguments:
+  name (Symbol, to_sym)
+    The name of the adapter to mixin.
 ```
-
-###### Arguments
-
-*name* \<Symbol, #to_sym> The name of the adapter to mixin.
 
 ##### Instance Methods
 
@@ -101,19 +101,15 @@ Pop a message off a queue.
 
 aliases: pop, receive, shift
 returns: Object, nil
+arguments:
+  options (Hash, to_hash, to_h)
+    The adapter-specific options.
+options:
+  :from (Symbol, to_sym, String, to_s)
+    The name of the queue to pop the message from. Enqueue will attempt to create a new queue, if one
+    cannot be found (lazily-created). Note that the queue name is global, meaning that the same Symbol
+    will correspond to the same queue no matter which instance is pushing to it. Default is `:global`.
 ```
-
-###### Arguments
-
-**options** \<Hash, #to_hash, #to_h> The adapter-specific options.
-
-###### Options
-
-`:from` \<Symbol, #to_sym, String, #to_s> The name of the queue to pop the message from. 
-Enqueue will attempt to create a new queue, if one cannot be found (lazily-created). 
-Note that the queue name is global, meaning that the same Symbol will correspond to the same queue 
-no matter which instance is pushing to it. 
-Default is `:global`.
 
 ### Example
 
