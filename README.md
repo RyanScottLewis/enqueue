@@ -26,7 +26,7 @@ You can define a publisher by subclassing `Enqueue::Publisher` or by including/e
 
 #### Global Methods
 
-Besides the methods that are mixed into publisher by an adapter, all publishers 
+Besides the methods that are mixed into Publisher by an adapter, all Publisher instances 
 will have the following methods:
 
 ##### Class Methods
@@ -76,7 +76,7 @@ including/extending `Enqueue::Subscriber::Base`.
 
 #### Global Methods
 
-Besides the methods that are mixed into publisher by an adapter, all publishers 
+Besides the methods that are mixed into Subscriber by an adapter, all Subscriber instances 
 will have the following methods:
 
 ##### Class Methods
