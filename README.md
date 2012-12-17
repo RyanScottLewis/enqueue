@@ -117,7 +117,7 @@ options:
 
 By default, Enqueue uses the [Queue][queue] class from the Ruby standard library.
 
-> Enqueue utilizes the [`service`][service] gem to push and pop messages to a queue within a run-loop that is running in it's own Thread.
+> Enqueue utilizes the [`service`][service] gem to push and pop messages to a queue within a run-loop that can run in it's own Thread.
 > 
 > Service gives simply allows you to run your code that is within the execute method in four different ways: 
 > once (execute), once in a new Thread (execute!), in a loop (start/run), or in a loop within a new Thread (start!/run!)
@@ -183,7 +183,8 @@ class WorldPublisher < HelloWorldPublisher
 end
 
 class HelloWorldSubscriber < Enqueue::Subscriber
-  # Publishers and Subscribers do not define #initialize so you do not need to remember to call `super` =)
+  # Publishers and Subscribers do not define #initialize,
+  # so you do not need to remember to call `super` =)
   def initialize
     setup_instance_variables
     setup_signals
@@ -281,7 +282,8 @@ end
 ##### `run_subscriptions` Instance Method
 
 The `run_subscriptions` instance method will call `run_subscription` with all of the subscriptions defined 
-on the instance's class in the order they were defined.
+on the instance's class in the order they were defined. By default, the only thing the `execute` method
+will do is call `run_subscriptions`.
 
 ##### `run_subscription` Instance Method
 
