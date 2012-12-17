@@ -320,7 +320,82 @@ class Subscriber < Enqueue::Subscriber
 end
 ````
 
+#### Managing Queues
+
+Queues are held in a single Hash in the `Enqueue.registry`. By default, this is just an empty Hash.  
+When a Publisher enqueues a message to a queue or a Subscriber dequeues a message from a queue, that 
+queue is lazily-defined in the registry using the default class for the Publisher/Subscriber's adapter.
+
+```ruby
+require 'enqueue'
+
+publisher = Enqueue::Publisher.new
+
+publisher.enqueue('Hello, World!')
+publisher.enqueue('Hello, World!')
+publisher.enqueue('Hello, World!')
+
+p Enqueue.registry[:global].count # => 3
+
+Enqueue.registry[:global] = Queue.new
+
+publisher.enqueue('Hello, World!')
+
+p Enqueue.registry[:global].count # => 1
+```
+
+This means, unless you use an adapter, every process you spawn will have it's own separate queue registry.  
+If a Publisher/Subscriber knows how to connect to a third-party message broker, then the queue that it 
+lazily-defines will actually be a client interface to that broker.
+
 #### Adapters
+
+##### Distributed Ruby
+
+###### Publisher
+
+```ruby
+require 'enqueue'
+
+class Publisher < Enqueue::Publisher
+  adapter :drb
+  host 'localhost'
+  port 1234
+  
+  def execute
+    sleep rand(5)
+    enqueue 'Hello, ', to: 'First Queue'
+    sleep rand(5)
+    enqueue 'World!', to: 'Second Queue'
+  end
+end
+```
+
+###### Subscriber
+
+```ruby
+require 'enqueue'
+
+class Subscriber < Enqueue::Subscriber
+  adapter :drb
+  host 'localhost'
+  port 1234
+  
+  def initialize
+    @buffer = []
+  end
+  
+  def execute
+    message = dequeue from: @buffer.empty? ? 'First Queue' : 'Second Queue'
+    @buffer << message unless message.nil?
+    
+    if @buffer.length == 2
+      puts @buffer.join
+      @buffer.clear
+    end
+  end
+end
+```
 
 ##### AMQP
 
