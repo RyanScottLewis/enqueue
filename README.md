@@ -330,7 +330,6 @@ using the `:amqp` adapter:
 ```ruby
 class Publisher < Enqueue::Publisher
   adapter :amqp
-  # This class now has AMQP specific class and instance methods:
   host 'localhost'
   port 5672
   
@@ -341,7 +340,6 @@ end
 
 class Subscriber < Enqueue::Subscriber
   adapter :amqp
-  # This class now has AMQP specific class and instance methods:
   host 'localhost'
   port 5672
   
