@@ -361,6 +361,8 @@ class Publisher < Enqueue::Publisher
   adapter :drb
   host 'localhost'
   port 1234
+  # OR:
+  # uri 'drb://localhost:1234'
   
   def execute
     sleep rand(5)
@@ -380,6 +382,8 @@ class Subscriber < Enqueue::Subscriber
   adapter :drb
   host 'localhost'
   port 1234
+  # OR:
+  # uri 'drb://localhost:1234'
   
   def initialize
     @buffer = []
@@ -407,6 +411,8 @@ class Publisher < Enqueue::Publisher
   adapter :amqp
   host 'localhost'
   port 5672
+  # OR:
+  # uri 'amqp://localhost:5672'
   
   def notify(message)
     enqueue message, to: 'my_scope.my_message_queue'
@@ -417,6 +423,8 @@ class Subscriber < Enqueue::Subscriber
   adapter :amqp
   host 'localhost'
   port 5672
+  # OR:
+  # uri 'amqp://localhost:5672'
   
   subscribe :print_message, to: 'my_scope.my_message_queue'
   
