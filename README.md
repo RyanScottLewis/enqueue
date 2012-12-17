@@ -37,11 +37,9 @@ adapter(name)
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
 
 returns: true, false
+arguments:
+  name (Symbol, to_sym) The name of the adapter to mixin.
 ```
-
-###### Arguments
-
-*name* \<Symbol, #to_sym> The name of the adapter to mixin.
 
 ##### Instance Methods
 
@@ -246,7 +244,7 @@ HelloWorldSubscriber.new
 
 ##### `subscribe` Class Method
 
-You can "subscribe" a method to a queue by using the `subscribe` class method.
+You can "subscribe" an instance method to a queue by using the `subscribe` class method.
 
 For example, the following:
 
