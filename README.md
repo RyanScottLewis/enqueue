@@ -2,7 +2,7 @@
 
 __enqueue__ _verb_ _\en′kyü\_ __:__ To add an item to a queue.
 
-Enqueue is an interface to [message queues][message_queue] for easy parallel processing and 
+Enqueue is an interface to [message queues][message_queue] and brokers for easy parallel processing and 
 multi-threading.
 
 ## Install
@@ -35,6 +35,7 @@ will have the following methods:
 adapter(name)
 
 Remove any previous adapter specific methods and include the module associated with the given Symbol.
+It is important to note only new instances of the class will use the new adapter methods.
 
 returns: true, false
 arguments:
@@ -403,7 +404,7 @@ end
 
 ##### AMQP
 
-Any message queue broker that utilizes the AMQP protocol (RabbitMQ, SqiftMQ, etc.) can be used by
+Any message queue broker that utilizes the AMQP protocol (RabbitMQ, SwiftMQ, etc.) can be used by
 using the `:amqp` adapter:
 
 ```ruby
