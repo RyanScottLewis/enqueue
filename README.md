@@ -327,8 +327,7 @@ end
 ```ruby
 class Publisher < Enqueue::Publisher
   adapter :rabbit_mq
-  # This class now has RabbitMQ specific class and
-  # instance methods:
+  # This class now has RabbitMQ specific class and instance methods:
   host 'localhost'
   port 5672
   
@@ -364,8 +363,7 @@ end
 puts "Press CTRL-C to exit."
 
 5.times do
-  publisher = Publisher.new
-  publishers << publisher
+  publishers << publisher = Publisher.new
   publisher.connect
   threads << Thread.new do
     loop do
@@ -376,8 +374,7 @@ puts "Press CTRL-C to exit."
 end
 
 5.times do
-  subscriber = Subscriber.new
-  subscribers << subscriber
+  subscribers << subscriber = Subscriber.new
   subscriber.connect
   threads << subscriber.run!
 end
