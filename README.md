@@ -2,7 +2,7 @@
 
 __enqueue__ _verb_ _\en′kyü\_ __:__ To add an item to a queue.
 
-Enqueue is an interface to [message queues][message_queue] and brokers for easy parallel processing.
+Enqueue is an interface to [message queues][message_queue] and brokers for easy parallel processing and multi-threading.
 
 ## Install
 
@@ -57,8 +57,9 @@ arguments:
     The adapter-specific options.
 options:
   :to (Symbol, to_sym, String, to_str, to_s)
-    The name of the queue to push the message to. Enqueue will attempt to create a new queue, if one 
-    cannot be found (lazy-creation).
+    The name of the queue to push the message to.
+    
+    Enqueue will attempt to create a new queue, if one cannot be found (lazy-creation).
     
     Note that the queue name is global, meaning that the same Symbol 
     will correspond to the same queue no matter which instance is pushing to it.
@@ -251,7 +252,7 @@ For example, the following:
 ```ruby
 class Subscriber < Enqueue::Subscriber
   def execute
-    message = dequeue
+    message = dequeue from: 'my_stuff.queue'
     puts message unless message.nil?
   end
 end
@@ -261,29 +262,13 @@ Can be written as:
 
 ```ruby
 class Subscriber < Enqueue::Subscriber
-  subscribe :print_message, to: :
+  subscribe :print_message, to: 'my_stuff.queue'
   
   def print_message(message)
     puts message
   end
 end
-````
-
-Which is the same as:
-
-```ruby
-class Subscriber < Enqueue::Subscriber
-  subscribe :print_message
-  
-  def print_message(message)
-    puts message
-  end
-  
-  def execute
-    run_subscriptions
-  end
-end
-````
+```
 
 ##### `run_subscriptions` Instance Method
 
@@ -294,37 +279,10 @@ will do is call `run_subscriptions`.
 ##### `run_subscription` Instance Method
 
 The `run_subscription` instance method will call `dequeue` with the options given to the `subscribe` method 
-and call the instance method subscribed to the queue, if the message is not nil.
+and call the instance method(s) subscribed to the queue.
 
-If the `:condition` option was passed to the `subscribe` method, then the instance method subscribed will be 
+If the `:condition` option is passed to the `subscribe` method, then the instance method subscribed will be 
 called if the proc given to the `:condition` option returns true.
-
-For example, the following:
-
-```ruby
-class Subscriber < Enqueue::Subscriber
-  def execute
-    message = dequeue
-    puts message unless message.nil?
-  end
-end
-```
-
-Can be written as:
-
-```ruby
-class Subscriber < Enqueue::Subscriber
-  subscribe :print_message
-  
-  def print_message(message)
-    puts message
-  end
-  
-  def execute
-    run_subscription :print_message
-  end
-end
-````
 
 #### Managing Queues
 
