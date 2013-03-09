@@ -2,8 +2,7 @@
 
 __enqueue__ _verb_ _\en′kyü\_ __:__ To add an item to a queue.
 
-Enqueue is an interface to [message queues][message_queue] and brokers for easy parallel processing and 
-multi-threading.
+Enqueue is an interface to [message queues][message_queue] and brokers for easy parallel processing.
 
 ## Install
 
@@ -21,8 +20,7 @@ A publisher is any object that can find and push messages to a queue.
 
 #### Defining
 
-You can define a publisher by subclassing `Enqueue::Publisher` or by including/extending 
-`Enqueue::Publisher::Base`.
+You can define a publisher by subclassing `Enqueue::Publisher` or by including `Enqueue::Publisher::Base`.
 
 #### Global Methods
 
@@ -58,10 +56,14 @@ arguments:
   options (Hash, to_hash, to_h)
     The adapter-specific options.
 options:
-  :to (Symbol, to_sym, String, to_s)
+  :to (Symbol, to_sym, String, to_str, to_s)
     The name of the queue to push the message to. Enqueue will attempt to create a new queue, if one 
-    cannot be found (lazily-created). Note that the queue name is global, meaning that the same Symbol 
-    will correspond to the same queue no matter which instance is pushing to it. Default is `:global`.
+    cannot be found (lazy-creation).
+    
+    Note that the queue name is global, meaning that the same Symbol 
+    will correspond to the same queue no matter which instance is pushing to it.
+    
+    Default is `:global`.
 ```
 
 ### Subscriber
@@ -73,7 +75,7 @@ A subscriber is any object that can find and pop messages off a queue.
 #### Defining
 
 Just like a publisher, you can define a subscriber by subclassing `Enqueue::Subscriber` or by 
-including/extending `Enqueue::Subscriber::Base`.
+including `Enqueue::Subscriber::Base`.
 
 #### Global Methods
 
@@ -107,9 +109,12 @@ arguments:
     The adapter-specific options.
 options:
   :from (Symbol, to_sym, String, to_s)
-    The name of the queue to pop the message from. Enqueue will attempt to create a new queue, if one
-    cannot be found (lazily-created). Note that the queue name is global, meaning that the same Symbol
-    will correspond to the same queue no matter which instance is pushing to it. Default is `:global`.
+    The name of the queue to pop the message from.
+    
+    Note that the queue name is global, meaning that the same Symbol
+    will correspond to the same queue no matter which instance is pushing to it.
+    
+    Default is `:global`.
 ```
 
 ### Example
@@ -256,7 +261,7 @@ Can be written as:
 
 ```ruby
 class Subscriber < Enqueue::Subscriber
-  subscribe :print_message
+  subscribe :print_message, to: :
   
   def print_message(message)
     puts message
